@@ -7,7 +7,12 @@ all: ../../libchemcpp.dll ../../libchemcpp.so
 
 ../../libchemcpp.dll: $(objects) 
 	$(CXX) -shared -o ../../libchemcpp.dll $(CXXFLAGS) $(objects)
-	
+
+UNAME := $(shell uname -s)
+ifeq ($(UNAME), Darwin)
+../../libchemcpp.so: $(objects) 
+	$(CXX) -dynamiclib -o ../../libchemcpp.so $(CXXFLAGS) $(objects) -Wl,-install_name -Wl,@loader_path/libchemcpp.so
+else 
 ../../libchemcpp.so: $(objects) 
 	$(CXX) -shared -o ../../libchemcpp.so $(CXXFLAGS) $(objects)
-	
+endif
