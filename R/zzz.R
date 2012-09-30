@@ -1,7 +1,7 @@
 
 #Cannot work with NAMESPACE, because environment-variable has to be set first...
 .onLoad <- function(lib, pkg, ...) {
-  Sys.setenv(RCHEMCPPPATH= system.file("chemcpp", package=pkg) )
+  Sys.setenv(RCHEMCPPPATH=file.path(lib,pkg,"chemcpp"))
   library.dynam(chname="Rchemcpp",package=pkg,lib.loc=lib)
 }
 

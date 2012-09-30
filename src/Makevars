@@ -1,13 +1,11 @@
 ## Use the R_HOME indirection to support installations of multiple R version
 PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` -L./ -lchemcpp -Wl,-rpath,$(R_PACKAGE_DIR)/libs
 
-#-L./ -lchemcpp
-
 PKG_CPPFLAGS = -I./chemcpp/src
 
 all: sublib
 
 sublib:
-	@(cd chemcpp/src && CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" MkInclude="$(MkInclude)" $(MAKE) all) || exit 1;
+	@(cd chemcpp/src && CXX="$(CXX)" CXXFLAGS="$(CXXFLAGS)" MkInclude="$(MkInclude)" $(MAKE) all) || exit 1;
 
 

@@ -14,7 +14,7 @@ It uses the compiled-in c++ library "chemcpp" to emulate the five chemcpp tools
 \tabular{ll}{
 	Package: \tab Rchemcpp\cr
 	Type: \tab Package\cr
-	Version: \tab 1.0.2\cr
+	Version: \tab 1.0.4\cr
 	Date: \tab 2012-10-15\cr
 	License: \tab GPL2.1\cr
 	}

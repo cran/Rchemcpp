@@ -1,4 +1,4 @@
-119bbe33c9a099406308b1b7b3d87fe7 *DESCRIPTION
+589574ef5218aa8985a63ef8f2c90fa7 *DESCRIPTION
 b7f47d67b305056ef1cda2348c70db4a *NAMESPACE
 4a0c6155bfa30bc9675d94869250728f *R/getMoleculeNamesFromSDF.R
 91e152aaab21f985514c5aa250eaf91a *R/roxygen.R
@@ -8,7 +8,7 @@ a6a84868548d82b7f8408a772f8bbaa2 *R/sd2gram3Dspectrum.R
 1dd9b19a0f792b833fd4b5a4868f0e50 *R/sd2gramSpectrum.R
 41be92d1d572fdd6a632413ec4a967b4 *R/sd2gramSubtree.R
 d8fb0be60a57a7bd5d27f26cbc75125c *R/utility.R
-0395e1293082ae4eb534bc6a80084148 *R/zzz.R
+3997c1215f663200f74bab04a17c07bd *R/zzz.R
 d40ec9953145e204bcb1532c44983847 *cleanup
 ecbc66c32df019ce815d6a45cb501637 *inst/chemcpp/data/elements.csv
 910a8a13f75c0288f0e51a583538994c *inst/chemcpp/data/gramAtoms.ad5.dotproduct.csv
@@ -26,11 +26,11 @@ f9759d3a72c6f0b02bc5196016658a81 *inst/chemcpp/data/gramBonds.csv
 4e1277341f7b60f8a51c1f742961b453 *inst/chemcpp/data/keggatoms.csv
 05c3a0ad6868bfe753ea16f4d726e096 *inst/chemcpp/data/toto.csv
 9675b7d3ebcf8263e0a933e90b46c7ec *inst/doc/Rchemcpp.Rnw
-3c0faf85b8bc741507cfca06fcfb1b96 *inst/doc/Rchemcpp.pdf
+d5cbabe2d5be96c9a21b290943395eb1 *inst/doc/Rchemcpp.pdf
 ccbbf71a568b366ce8edba14a75d534b *inst/sample_data/mutag.sdf
 c430ccee38c9d76b00169553534f4c8e *inst/sample_data/mutag_small.sdf
 a9a002baded008ebce832043fa042c5b *inst/sample_data/mutag_tiny.sdf
-f5a9732b1ff1aec8d3ea63ad56408f3e *man/Rchemcpp-package.Rd
+4ea254d851d934a4c558458cfc26b0e3 *man/Rchemcpp-package.Rd
 065de53edbc52ae4d0abe8910d9faee6 *man/Rcpp_Rmolecule-class.Rd
 4c1af6d5bd5fd0e8ad9aa216d1c5c4da *man/Rcpp_Rmoleculeset-class.Rd
 11a86bb51eb70d0cde8c9e9e78cfdd16 *man/createRMolecule.Rd
@@ -48,14 +48,14 @@ e15c712da17a5318db1375e4d80244b2 *source_prep/constant.h.append
 d61bfd9ca94766e14377079a57333028 *source_prep/del_chemcpp.sh
 342ee82061a7b168fc3f32e637ad9d4e *source_prep/prep_chemcpp_1.0.2.sh
 46fa8067d5b03f3446d212b6438b3359 *source_prep/strip_chemcpp_1.0.2.sh
-f72c9f55691389494861dd75a253282c *src/Makevars
+0cde4fce4d4fbb479991a1bb533405e2 *src/Makevars
 d3691b3f8a124fd0049f31a74cb999e3 *src/Relements.cpp
 ac1bc2147225bb93db5b56a26cfa9509 *src/Relements.h
 b0d7b2234b3166e106a098906db876a6 *src/Rmolecule.cpp
 17a4cb30a0a33b9e54466040c194111b *src/Rmolecule.h
 e7e743b8702ce69a5c4460ee3f03c0b0 *src/Rmoleculeset.cpp
 b5036f82141196cb6da9cc83e4de4f58 *src/Rmoleculeset.h
-29843dde6eecc6cfb9881846465ee954 *src/chemcpp/src/Makefile
+951b6b4b1c6bd806ece92998f80d1d13 *src/chemcpp/src/Makefile
 e0f53e05b698d766b003df4d8896d68d *src/chemcpp/src/atom.cpp
 43830fd089c0fec224e389a03e4b2060 *src/chemcpp/src/atom.h
 029cdf74251de1fed290e3f73df34097 *src/chemcpp/src/bond.cpp
