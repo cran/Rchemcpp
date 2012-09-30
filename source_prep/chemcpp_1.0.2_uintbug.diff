@@ -1,0 +1,11 @@
+--- ./chemcpp_1.0.2/src/stringutils.h	2007-11-28 12:18:05.000000000 +0100
++++ ./chemcpp_1.0.2/src/stringutils.hnew	2012-01-08 08:44:00.094888849 +0100
+@@ -32,6 +32,8 @@
+ #include <vector>
+ #include <sstream>
+ 
++typedef unsigned int uint;
++
+ using namespace std;
+ 
+ 

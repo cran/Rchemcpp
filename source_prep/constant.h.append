@@ -1,0 +1,7 @@
+
+#include <string>
+#include <stdlib.h>
+
+std::string GETChemcpppath();
+#define CHEMCPPPATH GETChemcpppath() +	
+

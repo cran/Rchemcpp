@@ -1,0 +1,8 @@
+#!/bin/sh
+
+rm ./src/*.o
+rm ./src/*.so
+rm ./src/*.dll
+
+rm ./src/chemcpp/src/*.o
+

@@ -1,0 +1,190 @@
+\documentclass[article]{bioinf}
+
+\usepackage[noae]{Sweave}
+\usepackage{amsmath,amssymb}
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage[authoryear]{natbib}
+
+\hypersetup{colorlinks=false,
+   pdfborder=0 0 0,
+   pdftitle={Rchemcpp - Kernels for molecules},
+   pdfauthor={G\"unter Klambauer}}
+
+\title{Rchemcpp - Kernels for molecules}
+\author{Michael Mahr and G\"unter Klambauer}
+\affiliation{Institute of Bioinformatics, Johannes Kepler University
+Linz\\Altenberger Str. 69, 4040 Linz, Austria\\
+\email{michael.mahr@gmail.com}}
+
+%\VignetteIndexEntry{Rchemcpp}
+%\VignetteKeywords{Kernel, kernels, graph, graphs, similarity, molecules, compounds}
+
+
+
+\newcommand{\Rchemcpp}{\texttt{Rchemcpp}}
+\newcommand{\method}[1]{{\fontfamily{phv}\fontshape{rm}\selectfont #1}}
+\newcommand{\R}{R}
+\newcommand{\Real}{\mathbb{R}}
+
+\renewcommand{\vec}[1]{\mathbf{#1}}
+
+\setkeys{Gin}{width=0.55\textwidth}
+
+\SweaveOpts{eps=FALSE}
+
+\begin{document}
+<<echo=FALSE>>=
+options(width=75)
+set.seed(0)
+library(Rchemcpp)
+RchemcppVersion <- packageDescription("Rchemcpp")$Version
+@
+\newcommand{\RchemcppVersion}{\Sexpr{RchemcppVersion}}
+\manualtitlepage[Version \RchemcppVersion, \today]
+
+%\section*{Scope and Purpose of this Document}
+%
+%This document is a user manual for the \R\ package \cnmops.
+%It is only meant as a gentle introduction into how to use the basic
+%functions implemented in this package. Not all features of the \R\
+%package are described in full detail. Such details can be obtained
+%from the documentation enclosed in the  \R\ package. Further note
+%the following: (1) this is neither an introduction to CNV detection from NGS 
+%data; (2) this is not an introduction to \R.
+%If you lack the background for understanding this manual, you first
+%have to read introductory literature on these subjects.
+%
+
+
+\vspace{1cm}
+
+\newlength{\auxparskip}
+\setlength{\auxparskip}{\parskip}
+\setlength{\parskip}{0pt}
+\tableofcontents
+\clearpage
+\setlength{\parskip}{\auxparskip}
+
+\newlength{\Nboxwidth}
+\setlength{\Nboxwidth}{\textwidth}
+\addtolength{\Nboxwidth}{-2\fboxrule}
+\addtolength{\Nboxwidth}{-2\fboxsep}
+
+\newcommand{\notebox}[1]{%
+\begin{center}
+\fbox{\begin{minipage}{\Nboxwidth}
+\noindent{\sffamily\bfseries Note:} #1
+\end{minipage}}
+\end{center}}
+
+\section{Introduction}
+The \Rchemcpp\ package is part of the CRAN  project. The functionality of {\tt
+Chemcpp} (\url{http://chemcpp.sourceforge.net/html/index.html}) is provided
+in \R, that is the computation of similarities between molecules by kernel
+functions. The following kernels are implemented:
+\begin{itemize}
+\item the marginalized graph kernel between labeled graphs \citep{Kashima2004}.
+\item extensions of the marginalized kernel \citep{Mahe2004}.
+\item Tanimoto kernels \citep{Ralaivola2005}.
+\item graph kernels based on tree patterns \citep{Mahe2009a}.
+\item kernels based on pharmacophores for 3D structure of molecules \citep{Mahe2006}.
+\end{itemize}
+
+%See \url{http://www.bioinf.jku.at/software/Rchemcpp/index.html} for additional
+%information.\par 
+
+\section{Getting started and quick start}
+
+To load the package, enter the following in your \R\ session:
+<<>>=
+library(Rchemcpp)
+@
+
+We enter the filename of and SDF file to the function {\tt sd2gram}. This function
+computes the similarity of the molecules with the marginalized kernel 
+\citep{Kashima2004} approach.\\
+
+<<results=hide>>=
+sdfolder <- system.file("sample_data",package="Rchemcpp")
+sdf <- list.files(sdfolder,full.names=TRUE,pattern="small")
+K <- sd2gram(sdf,returnNormalized=TRUE)
+@
+
+The similarity values are now stored in {\tt K}. We visualize this matrix as
+a heatmap.
+
+<<eval=FALSE>>=
+heatmap(K,Rowv=NA,Colv=NA,scale="none")
+@
+
+
+<<fig=FALSE,echo=FALSE,results=hide>>=
+pdf("001.pdf")
+par(oma=c(6,0,0,2))
+heatmap(K,Rowv=NA,Colv=NA,scale="none")
+dev.off()
+@
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[angle=0,width= 0.9\columnwidth]{001.pdf}
+\end{center}
+\end{figure} 
+
+
+
+
+\newpage
+
+\section{Molecular similarity for clustering}
+Based on the similarity measure we can run clustering algorithms on the data
+in order to find groups among the molecules. We use Affinity Propagation 
+Clustering \citep{Frey2007} as implemented by \citet{Bodenhofer2011} 
+for this task, because the cluster centers are real molecules. 
+
+<<>>=
+library(apcluster)
+r <- apcluster(K)
+@
+
+
+<<eval=FALSE>>=
+plot(r,K)
+@
+
+<<fig=FALSE,echo=FALSE,results=hide>>=
+pdf("002.pdf")
+par(oma=c(6,0,0,2))
+plot(r,K)
+dev.off()
+@
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[angle=0,width= 0.9\columnwidth]{002.pdf}
+\end{center}
+\end{figure} 
+
+
+%\section{Molecular similarity for prediction tasks using SVMs}
+
+
+
+
+%\section{How to cite this package}
+
+%If you use this package for research that is published later, you are kindly
+%asked to cite it as follows: \citep{Mahr:12}.
+
+%To obtain Bib\TeX\ entries of the reference, you can enter the following
+%into your R session:
+%<<eval=FALSE>>=
+%toBibtex(citation("Rchemcpp"))
+%@ 
+
+\bibliographystyle{natbib}
+\bibliography{literature}
+
+
+\end{document}
