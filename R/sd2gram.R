@@ -4,19 +4,12 @@
 #' @description This tools compute the marginalized kernel (\cite{Kashima, 2004})
 #' and its proposed extensions (\cite{Mahe, 2005)}.
 #' 
-#' @usage sd2gram(sdFileName, sdFileName2 = "", stopP = 0.1, 
-#'		filterTottering = FALSE, converg = as.integer(1000),  
-#'		atomKernelMatrix = "", flagRemoveH = FALSE, morganOrder = as.integer(0),
-#'		fileType = c("sd","genericsd","kcf"), silentMode = FALSE, 
-#'		returnNormalized = TRUE, moleculeNameProperty = "",
-#'		moleculeNameProperty2 = "")
 #' 
 #' 
-#' 
-#' @param sdFileName File containing the molecules. Must be in MDL file format
+#' @param sdf File containing the molecules. Must be in MDL file format
 #' (MOL and SDF files). For more information on the file format see 
 #' http://en.wikipedia.org/wiki/Chemical_table_file. Default = "missing".
-#' @param sdFileName2 A second file containing molecules. Must also be in SDF.
+#' @param sdf2 A second file containing molecules. Must also be in SDF.
 #' If specified the molecules of the first file will be compared with the 
 #' molecules of this second file. Default = "missing".
 #' @param stopP ... . Default = 0.1.
@@ -33,21 +26,16 @@
 #' @param morganOrder The order of the DeMorgan Indices to be used. If set to
 #' zero no DeMorgan Indices are used. The higher the order the more different
 #' types of atoms exist and consequently the more dissimilar will be the molecules.
-#' @param fileType Which filetype was submitted.
 #' @param silentMode Whether or not the program should print progress reports
 #' to the standart output. Default = FALSE.
 #' @param returnNormalized A logical specifying whether a normalized kernel
 #' matrix should be returned. Default = TRUE.
-#' @param moleculeNameProperty A string which specifies the name of the property
-#' of the molecules in the sdFile from which the row names (and column names)
-#' are read from. Default = "".
-#' @param moleculeNameProperty2 A string which specifies the name of the property
-#' of the molecules in the sdFile 2 from which the column names are read from.
-#' Default = "".
+#' @param detectArom Whether aromatic rings should be detected and aromatic
+#' bonds should a special bond type. (Default = TRUE).
 #' @examples 
 #' sdfolder <- system.file("sample_data",package="Rchemcpp")
 #' sdf <- list.files(sdfolder,full.names=TRUE,pattern="small")
-#' K <- sd2gram(sdf, moleculeNameProperty="Compound Name")
+#' K <- sd2gram(sdf)
 #' @return A numeric matrix containing the similarity values between the
 #' molecules.
 #' @author Michael Mahr <rchemcpp@@bioinf.jku.at>
@@ -63,51 +51,93 @@
 #' activity relationship analysis with support vector machines. 
 #' J Chem Inf Model, 45(4):939-51, 2005.
 #' 
-#' @examples 
-#' sdfolder <- system.file("sample_data",package="Rchemcpp")
-#' sdf <- list.files(sdfolder,full.names=TRUE,pattern="small")
-#' moleculeNames <- sd2gram(sdf)
 #' 
 #' @export
 
 
-sd2gram = function(sdFileName, sdFileName2 = "", stopP = 0.1, 
+sd2gram <-  function(sdf, sdf2, stopP = 0.1, 
 		filterTottering = FALSE, converg = as.integer(1000),  
 		atomKernelMatrix = "", flagRemoveH = FALSE, morganOrder = as.integer(0),
-		fileType = c("sd","genericsd","kcf"), silentMode = FALSE, 
-		returnNormalized = TRUE, moleculeNameProperty = "",
-		moleculeNameProperty2 = "")
+		silentMode = FALSE, returnNormalized = TRUE, detectArom=TRUE)
 {
 	
 	nbThreadsWanted = as.integer(1)
 	fromN = as.integer(1)
-	
 	if(!is.numeric(stopP)) stop("stopP must be numeric")
 	if(!is.logical(filterTottering)) stop("filterTottering must be logical")
 	if(!is.numeric(converg)) stop("converg must be integer")
 	converg <- as.integer(converg)
-	if(!is.character(sdFileName)) stop("sdFileName must be string")
-	if(!is.character(sdFileName2)) stop("sdFileName2 must be string")
 	if(!is.character(atomKernelMatrix)) stop("atomKernelMatrix must be string")
-	if(!is.logical(flagRemoveH)) stop("flagRemoveH must be logical")
-	
-	#if(!is.numeric(nbThreadsWanted)) stop("nbThreadsWanted must be integer")
-	#nbThreadsWanted <- as.integer(nbThreadsWanted)
+	if(!is.logical(flagRemoveH)) stop("flagRemoveH must be logical")	
 	if(!is.numeric(morganOrder)) stop("morganOrder must be integer")
-	morganOrder <- as.integer(morganOrder)
-	#if(!is.numeric(fromN)) stop("fromN must be integer")
-	#fromN <- as.integer(fromN)
-	
-	if(!is.character(fileType)) stop("fileType must be string")
+	morganOrder <- as.integer(morganOrder)	
 	if(!is.logical(silentMode)) stop("silentMode must be logical")
-	if(!is.logical(returnNormalized)) stop("returnNormalized must be logical")
+	if(!is.logical(returnNormalized)) stop("returnNormalized must be logical")	
+
+	if(!is.logical(detectArom)) stop("\"detectArom\" must be logical.")
 	
-	if (missing(fileType)) {fileType = fileType[1]}
-	fileType = match.arg(fileType)
+	if(inherits(sdf,"SDFset")){
+		aSet <- SDFsetToRmoleculeset(sdf,detectArom=detectArom)[[1]]
+		molnames <- ChemmineR::sdfid(sdf)
+		molnames2 <- molnames
+		if (!missing(sdf2)){
+			if (inherits(sdf2,"SDFset")){
+				aSet2 <- SDFsetToRmoleculeset(sdf2,detectArom=detectArom)[[1]]
+				molnames2 <- ChemmineR::sdfid(sdf2)
+			} else 
+				stop("Input must be existing SDF files or \"SDFset\" objects.")	
+		}
+		
+	} else if (inherits(sdf,"Rcpp_Rmoleculeset")) {
+		aSet <- sdf
+		molnames <- NULL
+		molnames2 <- NULL
+		if (!missing(sdf2)){
+			if (inherits(sdf2,"Rcpp_Rmoleculeset")){
+				aSet2 <- sdf2
+			} else 
+				stop("Input must be existing SDF files or \"SDFset\" objects.")
+		}
+		
+	} else if (is.character(sdf) & file.exists(sdf)) {
+		
+		TT <- try({
+					aSet <- new(Rmoleculeset)					
+					aSet$addSD(sdf,TRUE)
+					molnames <- getMoleculeNamesFromSDF(sdf)
+					molnames2 <- molnames
+					
+					if (!missing(sdf2)){
+						if (is.character(sdf2) & file.exists(sdf2)){
+							aSet2 <- new(Rmoleculeset)
+							aSet$addSD(sdf2,TRUE)
+							molnames2 <- getMoleculeNamesFromSDF(sdf2)		
+						} else 
+							stop("Input must be existing SDF files or \"SDFset\" objects.")	
+					} 
+				})
+		if (inherits(TT,"try-error")){
+			aSetList <- readRmoleculeset(sdf,detectArom=detectArom)
+			aSet <- aSetList[[1]]
+			molnames <- aSetList[[3]]
+			molnames2 <- aSetList[[3]]
+			if (!missing(sdf2)){
+				if (is.character(sdf2) & file.exists(sdf2)){
+					aSetList2  <-  readRmoleculeset(sdf2,detectArom=detectArom)
+					aSet2 <- aSetList2[[1]]
+					molnames2 <- aSetList2[[3]]
+				} else 
+					stop("Input must be existing SDF files or \"SDFset\" objects.")	
+			} 
+		}
+		
+	} else {
+		stop("Input must be existing SDF files or \"SDFset\" objects.")
+	}
 	
 	
-	aSet = new (Rchemcpp::Rmoleculeset);
-	aSet2 = new (Rchemcpp::Rmoleculeset);
+#aSet = new (Rchemcpp::Rmoleculeset);
+	
 	
 	if( atomKernelMatrix != "" ){
 		loadGramAtoms( atomKernelMatrix );	# atomKernelMatrix is set by the
@@ -119,34 +149,20 @@ sd2gram = function(sdFileName, sdFileName2 = "", stopP = 0.1,
 		print("reading file");
 	}
 	
-	if( fileType == "sd" ){
-		aSet$addSD( sdFileName, FALSE);
-		if( flagRemoveH == TRUE ) {
-			if( !silentMode ){
-				print("removing Hydrogens");
-			}
-			aSet$hideHydrogens();
+	if( flagRemoveH == TRUE ) {
+		if( !silentMode ){
+			print("removing Hydrogens");
 		}
-		
-	}else if( fileType == "genericsd" ){
-		aSet$addSD( sdFileName, TRUE);
-		
-	}else if( fileType == "kcf" ){
-		aSet$addKCF( sdFileName );
-		
-		if( flagRemoveH == TRUE ) {
-			if( !silentMode ){
-				print("removing Hydrogens");
-			}
-			aSet$hideHydrogens();
-		}
+		aSet$hideHydrogens();
 	}
+	
+	
 	
 	if( !silentMode ){
 		print("reading file done");
 	}
 	
-	if(sdFileName2 == ""){
+	if(missing(sdf2)){
 		# if the gram matrix is to be computed with all mol files in a single directory
 		
 		if( !silentMode ){
@@ -162,14 +178,16 @@ sd2gram = function(sdFileName, sdFileName2 = "", stopP = 0.1,
 			}
 			
 			
-			aSet$gramCompute(stopP, converg, fromN, nbThreadsWanted, silentMode, filterTottering, TRUE); #external			
+			aSet$gramCompute(stopP, converg, fromN, nbThreadsWanted, 
+					silentMode, filterTottering, TRUE); #external			
 			
 		}else{
 			if( !silentMode ){
 				print("using moleculeKernel Kashima");
 			}
 			
-			aSet$gramCompute(stopP, converg, fromN, nbThreadsWanted, silentMode, filterTottering, FALSE); #morgan			
+			aSet$gramCompute(stopP, converg, fromN, nbThreadsWanted, 
+					silentMode, filterTottering, FALSE); #morgan			
 		}
 		
 		
@@ -185,33 +203,14 @@ sd2gram = function(sdFileName, sdFileName2 = "", stopP = 0.1,
 			print("test set mode");
 		}
 		
-		
-		if( !silentMode ){
-			print("reading second file");
+		if( flagRemoveH == TRUE ) {
+			if( !silentMode ){
+				print("removing Hydrogens");
+			}
+			aSet2$hideHydrogens();
 		}
 		
-		if( fileType == "sd" ){
-			aSet2$addSD( sdFileName2, FALSE);
-			if( flagRemoveH == TRUE ) {
-				if( !silentMode ){
-					print("removing Hydrogens");
-				}
-				aSet2$hideHydrogens();
-			}
-			
-		}else if( fileType == "genericsd" ){
-			aSet2$addSD( sdFileName2, TRUE );
-			
-		}else if( fileType == "kcf" ){
-			aSet2$addKCF( sdFileName2 );
-			
-			if( flagRemoveH == TRUE ) {
-				if( !silentMode ){
-					print("removing Hydrogens");
-				}
-				aSet2$hideHydrogens();
-			}
-		}
+		
 		if( !silentMode ){
 			print("reading second file done");
 		}
@@ -228,6 +227,12 @@ sd2gram = function(sdFileName, sdFileName2 = "", stopP = 0.1,
 		
 		aSet$setMorganLabels( morganOrder );
 		aSet2$setMorganLabels( morganOrder );
+		
+		#TODO: Bug here - set comparison set
+		#aSet2$initializeSelfKernel( 0.0);  
+		#aSet$initializeSelfKernel( 0.0);   
+		#aSet$setComparisonSetCopy( aSet2 );
+		#aSet$initializeGram( 0.0 );
 		
 		if( atomKernelMatrix != "" ){
 			
@@ -267,46 +272,10 @@ sd2gram = function(sdFileName, sdFileName2 = "", stopP = 0.1,
 	}
 	
 	
-	#name the molecules
-	if (moleculeNameProperty != "")
-	{
-		molnames = c()
-		for (i in 0:(aSet$numMolecules() -1))
-		{
-			mol = aSet$getMolByIndex(i);
-			
-			if( moleculeNameProperty %in% mol$listStringDescriptors() )
-			{
-				molnames = c(molnames, mol$getStringDescriptorValue(moleculeNameProperty))
-			}
-			else
-			{
-				molnames = c(molnames, i)
-			}	
-		}
-		rownames(K) <- molnames
-
-		if (sdFileName2==""){
-			colnames(K) <- molnames
-		} else {
-			molnames2 = c()
-			for (i in 0:(aSet2$numMolecules() -1))
-			{
-				mol2 = aSet2$getMolByIndex(i);
-			
-				if( moleculeNameProperty2 %in% mol2$listStringDescriptors() )
-				{
-					molnames2 = c(molnames2, mol2$getStringDescriptorValue(moleculeNameProperty2))
-				}
-				else
-				{
-					molnames2 = c(molnames2, i)
-				}	
-			}
-			colnames(K) <- molnames2
-		}
-			
-	}
+#name the molecules
+	rownames(K) <- molnames
+	colnames(K) <- molnames2
+	
 	
 	return ( K )
 	

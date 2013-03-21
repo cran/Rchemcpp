@@ -15,7 +15,7 @@
 \author{Michael Mahr and G\"unter Klambauer}
 \affiliation{Institute of Bioinformatics, Johannes Kepler University
 Linz\\Altenberger Str. 69, 4040 Linz, Austria\\
-\email{michael.mahr@gmail.com}}
+\email{rchemcpp@bioinf.jku.at}}
 
 %\VignetteIndexEntry{Rchemcpp}
 %\VignetteKeywords{Kernel, kernels, graph, graphs, similarity, molecules, compounds}
@@ -108,7 +108,7 @@ computes the similarity of the molecules with the marginalized kernel
 <<results=hide>>=
 sdfolder <- system.file("sample_data",package="Rchemcpp")
 sdf <- list.files(sdfolder,full.names=TRUE,pattern="small")
-K <- sd2gram(sdf,returnNormalized=TRUE,moleculeNameProperty="Compound Name")
+K <- sd2gram(sdf)
 @
 
 The similarity values are now stored in {\tt K}. We visualize this matrix as
@@ -131,7 +131,6 @@ dev.off()
 \includegraphics[angle=0,width= 0.9\columnwidth]{001.pdf}
 \end{center}
 \end{figure} 
-
 
 
 
@@ -169,6 +168,31 @@ dev.off()
 
 %\section{Molecular similarity for prediction tasks using SVMs}
 
+
+\section{Working with SDFset objects from the package ChemmineR}
+In the {\tt ChemmineR} package {\tt SDFset} objects are defined, that make 
+the handling of molecules in \R easy and provide a lot of utility functions,
+like plotting.
+
+<<fig=TRUE>>=
+sdfFileName <- list.files(sdfolder,full.names=TRUE,pattern="small")
+sdfSet <- read.SDFset(sdfFileName)
+plot(sdfSet[2],print=FALSE)
+@
+
+It is possible to run the molecule kernels directly on {\tt SDFset} objects.
+<<>>=
+K1 <- sd2gramSubtree(sdfSet,silentMode=TRUE)
+@
+
+Comparing the objects in one set to the objects in another set is possible.
+
+<<>>=
+sdfSet1 <- sdfSet[1]
+sdfSet2 <- sdfSet[1:20]
+K2 <- sd2gramSubtree(sdfSet1,sdfSet2,silentMode=TRUE)
+dim(K2)
+@
 
 
 

@@ -275,6 +275,15 @@ void Elements::loadDefinition( string aFileName ){
 		}
 
 		StringUtils::Split( line, delimiter, value );
+		
+		if (header.size() != value.size())
+		{
+				stringstream out2;
+				out2 << aFileName << ": header/values mismatch";
+				CError e( UNKNOWNDATATYPE, out2.str() );
+				e.describe();
+				throw( e );
+		}
 
     		atomP = new Atom;
 		periodicTable[ value[symbolPosition] ] = atomP;

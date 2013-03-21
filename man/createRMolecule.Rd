@@ -16,7 +16,7 @@
   an instance of "molecule"
 }
 \description{
-  Creates an Rchemcpp::Rmolecule from an atom-vector and a
+  Creates an \"Rmolecule\" from an atom-vector and a
   bond-matrix
 }
 \examples{

@@ -75,7 +75,7 @@ RCPP_MODULE(Rmoleculeset){
 	.method( "writeSelfKernelList", &Rmoleculeset::writeSelfKernelList, "write self kernel list")
 
 	//Extension 1.0.7
-	.method( "getMolByIndex", &Rmoleculeset::getMolByIndex, "get Molecule by Index (zero-based)")
+	.method( "getMolByIndex", &Rmoleculeset::getMolByIndex, "get Pointer to a Molecule by Index (zero-based); managed by chemcpp; Object becomes invalid when moleculeset runs out of scope. ")
 	;
 }
 

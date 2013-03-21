@@ -3,28 +3,26 @@
 \title{sd2gram3Dspectrum - Similarity of molecules by fast
 approximations of the pharmacophore kernel}
 \usage{
-  sd2gram3Dspectrum(sdFileName, sdFileName2 = "",
-    chargesFileName = "", chargesFileName2 = "", kernelType
-    = c("3Pspectrum", "3Pbinary", "3Ptanimoto",
-    "2Pspectrum", "2Pbinary", "2Ptanimoto" ), depthMax =
-    as.integer(3), nBins = as.integer(20), distMin = 0,
-    distMax = 20, flagRemoveH = FALSE, morganOrder =
-    as.integer(0), chargesThreshold = 0, fileType = c("sd",
-    "genericsd","kcf"), silentMode = FALSE,
-    returnNormalized = FALSE, moleculeNameProperty = "",
-    moleculeNameProperty2 = "")
+  sd2gram3Dspectrum(sdf, sdf2, chargesFileName = "",
+    chargesFileName2 = "",
+    kernelType = c("3Pspectrum", "3Pbinary", "3Ptanimoto", "2Pspectrum", "2Pbinary", "2Ptanimoto"),
+    depthMax = as.integer(3), nBins = as.integer(20),
+    distMin = 0, distMax = 20, flagRemoveH = FALSE,
+    morganOrder = as.integer(0), chargesThreshold = 0,
+    silentMode = FALSE, returnNormalized = TRUE,
+    detectArom = TRUE)
 }
 \arguments{
-  \item{sdFileName}{File containing the molecules. Must be
-  in MDL file format (MOL and SDF files). For more
-  information on the file format see
+  \item{sdf}{File containing the molecules. Must be in MDL
+  file format (MOL and SDF files). For more information on
+  the file format see
   http://en.wikipedia.org/wiki/Chemical_table_file. Default
   = "missing".}
 
-  \item{sdFileName2}{A second file containing molecules.
-  Must also be in SDF. If specified the molecules of the
-  first file will be compared with the molecules of this
-  second file. Default = "missing".}
+  \item{sdf2}{A second file containing molecules. Must also
+  be in SDF. If specified the molecules of the first file
+  will be compared with the molecules of this second file.
+  Default = "missing".}
 
   \item{chargesFileName}{A character with the name of the
   file containing the atom charges. Default = missing.}
@@ -72,8 +70,6 @@ approximations of the pharmacophore kernel}
   and consequently the more dissimilar will be the
   molecules.}
 
-  \item{fileType}{Which filetype was submitted.}
-
   \item{silentMode}{Whether or not the program should print
   progress reports to the standart output.}
 
@@ -81,14 +77,9 @@ approximations of the pharmacophore kernel}
   normalized kernel matrix should be returned. Default =
   TRUE.}
 
-  \item{moleculeNameProperty}{A string which specifies the
-  name of the property of the molecules in the sdFile from
-  which the row names (and column names) are read from.
-  Default = "".}
-
-  \item{moleculeNameProperty2}{A string which specifies the
-  name of the property of the molecules in the sdFile 2
-  from which the column names are read from. Default = "".}
+  \item{detectArom}{Whether aromatic rings should be
+  detected and aromatic bonds should a special bond type.
+  (Default = TRUE).}
 }
 \value{
   A numeric matrix containing the similarity values between
@@ -103,7 +94,7 @@ approximations of the pharmacophore kernel}
 \examples{
 sdfolder <- system.file("sample_data",package="Rchemcpp")
 sdf <- list.files(sdfolder,full.names=TRUE,pattern="small")
-K <- sd2gram3Dspectrum(sdf, moleculeNameProperty="Compound Name")
+K <- sd2gram3Dspectrum(sdf)
 }
 \author{
   Michael Mahr <rchemcpp@bioinf.jku.at> c++ function

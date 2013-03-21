@@ -77,12 +77,12 @@ Trees and Sequences, pages 65-74, 2003.
 sdfolder <- system.file("sample_data",package="Rchemcpp")
 
 sdf_small <- list.files(sdfolder,full.names=TRUE,pattern="small")
-K1 <- sd2gram(sdf_small, moleculeNameProperty="Compound Name")
-K2 <- sd2gramSpectrum(sdf_small, moleculeNameProperty="Compound Name")
-K3 <- sd2gramSubtree(sdf_small, moleculeNameProperty="Compound Name")
+K1 <- sd2gram(sdf_small)
+K2 <- sd2gramSpectrum(sdf_small)
+K3 <- sd2gramSubtree(sdf_small)
 
 sdf_tiny <- list.files(sdfolder,full.names=TRUE,pattern="tiny")
-K4 <- sd2gram3Dspectrum(sdf_tiny, moleculeNameProperty="Compound Name")
-K5 <- sd2gram3Dpharma(sdf_tiny, moleculeNameProperty="Compound Name")
+K4 <- sd2gram3Dspectrum(sdf_tiny)
+K5 <- sd2gram3Dpharma(sdf_tiny)
 }
 

@@ -32,6 +32,8 @@
 #include <vector>
 #include <sstream>
 
+#include <algorithm>
+
 typedef unsigned int uint;
 
 using namespace std;

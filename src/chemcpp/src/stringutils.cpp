@@ -65,58 +65,24 @@ string StringUtils::toString(	const float input ){
 
 
 int StringUtils::Split(const string input, const string delimiter, vector<string>& results){
-	int iPos = -1;
-	int newPos = -1;
-	int sizeS2 = delimiter.size();
-	int isize = input.size();
-
-	vector<int> positions;
-
-	newPos = input.find( delimiter, 0 );
-
-	#ifdef DEBUG
-		//cout << newPos << endl;
-	#endif
-
-// only one word in the input
-	if( newPos < 0 ){
-		results.push_back( input );
-		return 0;
-	}
-
-// store delimiters positions
-  	int numFound = 0;
-	while( newPos > iPos ){
-		numFound++;
-		positions.push_back(newPos);
-		iPos = newPos;
-		newPos = input.find (delimiter, iPos+sizeS2+1);
-	}
-
-// push words
-	for( uint i=0; i <= positions.size(); i++ ){
-		string s;
-		int offset = 0;
-		if( i == 0 ){
-			s = input.substr( i, positions[i] );
-			offset = sizeS2;
-		}else{
-			offset = positions[i-1] + sizeS2;
-		}
-
-		if( offset < isize ){
-      			if( i == positions.size() ){
-        			s = input.substr(offset);
-			}else if( i > 0 ){
-				s = input.substr( positions[i-1] + sizeS2,
-        			positions[i] - positions[i-1] - sizeS2 );
-			}
-		}
-		if( s.size() > 0 ){
-			results.push_back(s);
-		}
-	}
-	return numFound+1;
+	if (delimiter.empty()) {
+        results.push_back(input);
+        return results.size();
+    }
+    string::const_iterator substart = input.begin(), subend;
+    bool keep_empty = true;
+    while (true) {
+        subend = search(substart, input.end(), delimiter.begin(), delimiter.end());
+        string temp(substart, subend);
+        if (keep_empty || !temp.empty()) {
+            results.push_back(temp);
+        }
+        if (subend == input.end()) {
+            break;
+        }
+        substart = subend + delimiter.size();
+    }
+    return results.size();
 }
 
 string StringUtils::mergeWords(	vector<string>& words, const string separator ){

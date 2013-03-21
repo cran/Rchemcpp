@@ -3,26 +3,25 @@
 \title{sd2gramSubtree - Similarity of molecules by several graph kernels
 based on the count of common subtrees}
 \usage{
-  sd2gramSubtree(sdFileName, sdFileName2 = "", kernelType =
-    c("sizebased","branchingbased") , branchKernelUntilN =
-    FALSE, lambda = 1, depthMax = as.integer(3),
-    flagRemoveH = FALSE, filterTottering = FALSE,
-    morganOrder = as.integer(0), fileType = c("sd",
-    "genericsd","kcf"), silentMode = FALSE,
-    returnNormalized = FALSE, moleculeNameProperty = "",
-    moleculeNameProperty2 = "")
+  sd2gramSubtree(sdf, sdf2,
+    kernelType = c("sizebased", "branchingbased"),
+    branchKernelUntilN = FALSE, lambda = 1,
+    depthMax = as.integer(3), flagRemoveH = FALSE,
+    filterTottering = FALSE, morganOrder = as.integer(0),
+    silentMode = FALSE, returnNormalized = TRUE,
+    detectArom = TRUE)
 }
 \arguments{
-  \item{sdFileName}{File containing the molecules. Must be
-  in MDL file format (MOL and SDF files). For more
-  information on the file format see
+  \item{sdf}{File containing the molecules. Must be in MDL
+  file format (MOL and SDF files). For more information on
+  the file format see
   http://en.wikipedia.org/wiki/Chemical_table_file. Default
   = "missing"}
 
-  \item{sdFileName2}{A second file containing molecules.
-  Must also be in SDF. If specified the molecules of the
-  first file will be compared with the molecules of this
-  second file. Default = "missing".}
+  \item{sdf2}{A second file containing molecules. Must also
+  be in SDF. If specified the molecules of the first file
+  will be compared with the molecules of this second file.
+  Default = "missing".}
 
   \item{kernelType}{Determines whether subtrees of the
   molecule are penalized size-based or branching-based.
@@ -31,7 +30,7 @@ based on the count of common subtrees}
   \item{branchKernelUntilN}{Logical whether tree patterns
   of until N should be considered. Default = FALSE.}
 
-  \item{lambda}{weighted contribution of tree-patterns
+  \item{lambda}{Weighted contribution of tree-patterns
   depending on their sizes Default = 1.}
 
   \item{depthMax}{tree-patterns of depth. Default = 3.}
@@ -48,23 +47,16 @@ based on the count of common subtrees}
   and consequently the more dissimilar will be the
   molecules.}
 
-  \item{fileType}{Which filetype was submitted.}
-
-  \item{silentMode}{Whether or not the program should print
+  \item{silentMode}{Whether the program should print
   progress reports to the standart output.}
 
   \item{returnNormalized}{A logical specifying whether a
   normalized kernel matrix should be returned. Default =
   TRUE.}
 
-  \item{moleculeNameProperty}{A string which specifies the
-  name of the property of the molecules in the sdFile from
-  which the row names (and column names) are read from.
-  Default = "".}
-
-  \item{moleculeNameProperty2}{A string which specifies the
-  name of the property of the molecules in the sdFile 2
-  from which the column names are read from. Default = "".}
+  \item{detectArom}{Whether aromatic rings should be
+  detected and aromatic bonds should a special bond type.
+  (Default = TRUE).}
 }
 \value{
   A numeric matrix containing the similarity values between
@@ -79,7 +71,7 @@ based on the count of common subtrees}
 \examples{
 sdfolder <- system.file("sample_data",package="Rchemcpp")
 sdf <- list.files(sdfolder,full.names=TRUE,pattern="small")
-K <- sd2gram(sdf, moleculeNameProperty="Compound Name")
+K <- sd2gram(sdf)
 }
 \author{
   Michael Mahr <rchemcpp@bioinf.jku.at> c++ function
