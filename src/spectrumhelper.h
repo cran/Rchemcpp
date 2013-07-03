@@ -33,7 +33,6 @@ rearranged from:
 #define SPECTRUMHELPER_H
 
 #include <Rcpp.h>
-#include <RcppClassic.h>
 #include <Rinternals.h>
 
 #include "Rmoleculeset.h"

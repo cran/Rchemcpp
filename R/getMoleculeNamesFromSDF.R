@@ -1,3 +1,24 @@
+#' @title getMoleculeNamesFromSDF - a helper function
+#' 
+#' @description This function helps to extract a certain property from an SDF file. Usually
+#' the molecule class, like "active/non-active" or a property of the molecule,
+#' like "biological activity", is also stored in the SDF file. These values
+#' often serve as targets for a prediction task. This function is a small
+#' wrapper that extracts the information.
+#' 
+#' @usage 
+#' getMoleculeNamesFromSDF(sdfile)
+#' 
+#' @param sdfile A character containing the name of the SDF file.
+#' @return A character vector with one name per molecule.
+#' @author Guenter Klambauer <rchemcpp@@bioinf.jku.at>
+#' 
+#' @examples 
+#' sdfolder <- system.file("sample_data",package="Rchemcpp")
+#' sdf <- list.files(sdfolder,full.names=TRUE,pattern="small")
+#' moleculeNames <- getMoleculeNamesFromSDF(sdf)
+#' 
+#' @export
 
 
 getMoleculeNamesFromSDF <- function(sdfile){
@@ -19,16 +40,27 @@ getMoleculeNamesFromSDF <- function(sdfile){
 
 #' @title getMoleculePropertyFromSDF - a helper function
 #' 
-#' This function helps to extract a certain property from an SDF file. Usually
+#' @description This function helps to extract a certain property from an SDF 
+#' file. Usually
 #' the molecule class, like "active/non-active" or a property of the molecule,
 #' like "biological activity", is also stored in the SDF file. These values
 #' often serve as targets for a prediction task. This function is a small
 #' wrapper that extracts the information.
 #' 
+#' @usage 
+#' getMoleculePropertyFromSDF(sdfile,property)
+#' 
+#' 
 #' @param sdfile A character containing the name of the SDF file.
 #' @param property The name of the slot in the SDF. 
 #' @return A character vector with one value per molecule.
 #' @author Guenter Klambauer <rchemcpp@@bioinf.jku.at>
+#'
+#'  @examples 
+#' sdfolder <- system.file("sample_data",package="Rchemcpp")
+#' sdf <- list.files(sdfolder,full.names=TRUE,pattern="small")
+#' moleculeNames <- getMoleculePropertyFromSDF(sdf,"Activity")
+#' 
 #' @export
 
 getMoleculePropertyFromSDF <- function(sdfile,property){

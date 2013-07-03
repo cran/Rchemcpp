@@ -2,9 +2,19 @@
 #' @title sd2gram3Dspectrum - Similarity of molecules by fast 
 #' approximations of the pharmacophore kernel
 #' 
-#' This tool implements the six discrete approximations of the pharmacophore
+#' @description This tool implements the six discrete approximations of the pharmacophore
 #' kernel presented in "The pharmacophore kernel for virtual screening 
 #' with support vector machines" (\cite{Mahe, 2006}).
+#' 
+#' @usage sd2gram3Dspectrum(sdFileName, sdFileName2 = "", 
+#'		chargesFileName = "", chargesFileName2 = "", 
+#'		kernelType = c("3Pspectrum", "3Pbinary", "3Ptanimoto", 
+#'				"2Pspectrum", "2Pbinary", "2Ptanimoto" ),
+#'		depthMax = as.integer(3), nBins = as.integer(20), distMin = 0, 
+#'		distMax = 20, flagRemoveH = FALSE, morganOrder = as.integer(0), 
+#'		chargesThreshold = 0, fileType = c("sd", "genericsd","kcf"), 
+#'		silentMode = FALSE, returnNormalized = FALSE,
+#'		moleculeNameProperty = "", moleculeNameProperty2 = "")
 #' 
 #' @param sdFileName File containing the molecules. Must be in MDL file format
 #' (MOL and SDF files). For more information on the file format see 
@@ -49,10 +59,16 @@
 #' to the standart output.
 #' @param returnNormalized A logical specifying whether a normalized kernel
 #' matrix should be returned. Default = TRUE.
+#' @param moleculeNameProperty A string which specifies the name of the property
+#' of the molecules in the sdFile from which the row names (and column names)
+#' are read from. Default = "".
+#' @param moleculeNameProperty2 A string which specifies the name of the property
+#' of the molecules in the sdFile 2 from which the column names are read from.
+#' Default = "".
 #' @examples 
 #' sdfolder <- system.file("sample_data",package="Rchemcpp")
 #' sdf <- list.files(sdfolder,full.names=TRUE,pattern="small")
-#' K <- sd2gram3Dspectrum(sdf)
+#' K <- sd2gram3Dspectrum(sdf, moleculeNameProperty="Compound Name")
 #' @return A numeric matrix containing the similarity values between the
 #' molecules.
 #' @author Michael Mahr <rchemcpp@@bioinf.jku.at>
@@ -61,6 +77,14 @@
 #' The pharmacophore kernel for virtual screening
 #' with support vector machines. Technical Report, HAL:ccsd-00020066, Ecole des
 #' Mines de Paris, March 2006.
+#' 
+#' 
+#' @examples 
+#' sdfolder <- system.file("sample_data",package="Rchemcpp")
+#' sdf <- list.files(sdfolder,full.names=TRUE,pattern="tiny")
+#' moleculeNames <- sd2gram3Dspectrum(sdf)
+#' 
+#' 
 #' @export
 
 
@@ -71,7 +95,8 @@ sd2gram3Dspectrum = function(sdFileName, sdFileName2 = "",
 		depthMax = as.integer(3), nBins = as.integer(20), distMin = 0, 
 		distMax = 20, flagRemoveH = FALSE, morganOrder = as.integer(0), 
 		chargesThreshold = 0, fileType = c("sd", "genericsd","kcf"), 
-		silentMode = FALSE, returnNormalized = FALSE)
+		silentMode = FALSE, returnNormalized = FALSE,
+		moleculeNameProperty = "", moleculeNameProperty2 = "")
 {
 	
 	if(!is.character(sdFileName)) stop("sdFileName must be string")
@@ -243,29 +268,6 @@ sd2gram3Dspectrum = function(sdFileName, sdFileName2 = "",
 			
 		}
 		
-		
-		
-		xx <- try(molNames1 <- getMoleculeNamesFromSDF(sdFileName))
-		if (inherits(xx,"try-error") | length(molNames1)!=nrow(K)){
-			molNames1 <- paste("Mol",1:nrow(K),sep="")
-		}
-		
-		if (sdFileName2==""){
-			molNames2 <- molNames1
-		} else {
-			yy <- try(molNames2 <- getMoleculeNamesFromSDF(sdFileName2))
-			if (inherits(yy,"try-error") | length(molNames2)!=ncol(K)){
-				molNames2 <- paste("Mol",(nrow(K)+1):(nrow(K)+ncol(K)))
-			}
-		}
-		
-		
-		rownames(K) <- molNames1
-		colnames(K) <- molNames2
-		
-		return ( K )
-		
-		
 		#aSet$writeSelfKernelList( outputDir + baseName + "_test", silentMode );
 		#aSet$getComparisonSet$writeSelfKernelList( outputDir + baseName + "_train", silentMode ); !!!
 		
@@ -380,31 +382,53 @@ sd2gram3Dspectrum = function(sdFileName, sdFileName2 = "",
 		}
 		
 		
-		
-		xx <- try(molNames1 <- getMoleculeNamesFromSDF(sdFileName))
-		if (inherits(xx,"try-error") | length(molNames1)!=nrow(K)){
-			molNames1 <- paste("Mol",1:nrow(K),sep="")
-		}
-		
-		if (sdFileName2==""){
-			molNames2 <- molNames1
-		} else {
-			yy <- try(molNames2 <- getMoleculeNamesFromSDF(sdFileName2))
-			if (inherits(yy,"try-error") | length(molNames2)!=ncol(K)){
-				molNames2 <- paste("Mol",(nrow(K)+1):(nrow(K)+ncol(K)))
-			}
-		}
-		
-		
-		rownames(K) <- molNames1
-		colnames(K) <- molNames2
-		
-		return ( K )
-		
-		
 		#aSet$writeSelfKernelList( outputDir + baseName + "_train", false);
 		
 	}  
+	
+	
+	#name the molecules
+	if (moleculeNameProperty != "")
+	{
+		molnames = c()
+		for (i in 0:(aSet$numMolecules() -1))
+		{
+			mol = aSet$getMolByIndex(i);
+			
+			if( moleculeNameProperty %in% mol$listStringDescriptors() )
+			{
+				molnames = c(molnames, mol$getStringDescriptorValue(moleculeNameProperty))
+			}
+			else
+			{
+				molnames = c(molnames, i)
+			}	
+		}
+		rownames(K) <- molnames
+
+		if (sdFileName2==""){
+			colnames(K) <- molnames
+		} else {
+			molnames2 = c()
+			for (i in 0:(aSet2$numMolecules() -1))
+			{
+				mol2 = aSet2$getMolByIndex(i);
+			
+				if( moleculeNameProperty2 %in% mol2$listStringDescriptors() )
+				{
+					molnames2 = c(molnames2, mol2$getStringDescriptorValue(moleculeNameProperty2))
+				}
+				else
+				{
+					molnames2 = c(molnames2, i)
+				}	
+			}
+			colnames(K) <- molnames2
+		}
+			
+	}
+	
+	return ( K )
 	
 }
 

@@ -21,7 +21,7 @@ RCPP_MODULE(Rmoleculeset){
 	.method( "addKCF", &Rmoleculeset::addKCF, "read molecule" )
 	.method( "addKCF2", &Rmoleculeset::addKCF2, "read molecule" )
 
-	.method( "numMolecules", &Rmoleculeset::numMolecules, "return the number of molecules")
+	.method( "numMolecules", &Rmoleculeset::numMolecules, "return the number of molecules in the set")
 
 	.method( "hideHydrogens", &Rmoleculeset::hideHydrogens, "hide hydrogens")
 
@@ -73,6 +73,9 @@ RCPP_MODULE(Rmoleculeset){
 	.method( "writeGramMatrix", &Rmoleculeset::writeGramMatrix, "write Gram matrix to file")
 
 	.method( "writeSelfKernelList", &Rmoleculeset::writeSelfKernelList, "write self kernel list")
+
+	//Extension 1.0.7
+	.method( "getMolByIndex", &Rmoleculeset::getMolByIndex, "get Molecule by Index (zero-based)")
 	;
 }
 

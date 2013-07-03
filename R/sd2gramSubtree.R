@@ -1,10 +1,19 @@
 #' @title sd2gramSubtree - Similarity of molecules by several graph kernels
 #' based on the count of common subtrees
 #'
-#' This tools computes several graph kernels based on the detection of common 
+#' @description This tools computes several graph kernels based on the detection of common 
 #' subtrees: the so-called
 #' tree-pattern graph kernels, originally introduced in (\cite{Ramon, 2003}), 
 #' and revisited in (\cite{Mahe, 2006}). 
+#' 
+#' @usage sd2gramSubtree(sdFileName, sdFileName2 = "", 
+#'		kernelType = c("sizebased","branchingbased") , 
+#'		branchKernelUntilN = FALSE, lambda = 1,  depthMax = as.integer(3), 
+#'		flagRemoveH = FALSE, filterTottering = FALSE, morganOrder = as.integer(0), 
+#'		fileType = c("sd", "genericsd","kcf"), silentMode = FALSE, 
+#'		returnNormalized = FALSE, moleculeNameProperty = "",
+#'		moleculeNameProperty2 = "")
+#' 
 #' 
 #' @param sdFileName File containing the molecules. Must be in MDL file format
 #' (MOL and SDF files). For more information on the file format see 
@@ -16,7 +25,7 @@
 #' size-based or branching-based. Default = "sizebased".
 #' @param branchKernelUntilN Logical whether tree patterns of until N should be 
 #' considered. Default = FALSE.
-#' @param lambda weighted contribution of tree-patterns depending on their sizes
+#' @param lambda Weighted contribution of tree-patterns depending on their sizes
 #' Default = 1.
 #' @param depthMax tree-patterns of depth. Default = 3. 
 #' @param flagRemoveH A logical that indicates whether H-atoms should be 
@@ -27,14 +36,20 @@
 #' zero no DeMorgan Indices are used. The higher the order the more different
 #' types of atoms exist and consequently the more dissimilar will be the molecules.
 #' @param fileType Which filetype was submitted.
-#' @param silentMode Whether or not the program should print progress reports
+#' @param silentMode Whether the program should print progress reports
 #' to the standart output.
 #' @param returnNormalized A logical specifying whether a normalized kernel
 #' matrix should be returned. Default = TRUE.
+#' @param moleculeNameProperty A string which specifies the name of the property
+#' of the molecules in the sdFile from which the row names (and column names)
+#' are read from. Default = "".
+#' @param moleculeNameProperty2 A string which specifies the name of the property
+#' of the molecules in the sdFile 2 from which the column names are read from.
+#' Default = "".
 #' @examples 
 #' sdfolder <- system.file("sample_data",package="Rchemcpp")
 #' sdf <- list.files(sdfolder,full.names=TRUE,pattern="small")
-#' K <- sd2gram(sdf)
+#' K <- sd2gram(sdf, moleculeNameProperty="Compound Name")
 #' @return A numeric matrix containing the similarity values between the
 #' molecules.
 #' @author Michael Mahr <rchemcpp@@bioinf.jku.at>
@@ -47,6 +62,12 @@
 #' graph kernels. In T. Washio and L. De Raedt, editors, 
 #' Proceedings of the First International Workshop on Mining Graphs, 
 #' Trees and Sequences, pages 65-74, 2003.
+#' 
+#' @examples 
+#' sdfolder <- system.file("sample_data",package="Rchemcpp")
+#' sdf <- list.files(sdfolder,full.names=TRUE,pattern="tiny")
+#' moleculeNames <- sd2gramSubtree(sdf)
+#' 
 #' @export
 
 
@@ -55,7 +76,8 @@ sd2gramSubtree = function(sdFileName, sdFileName2 = "",
 		branchKernelUntilN = FALSE, lambda = 1,  depthMax = as.integer(3), 
 		flagRemoveH = FALSE, filterTottering = FALSE, morganOrder = as.integer(0), 
 		fileType = c("sd", "genericsd","kcf"), silentMode = FALSE, 
-		returnNormalized = FALSE)
+		returnNormalized = FALSE, moleculeNameProperty = "",
+		moleculeNameProperty2 = "")
 {
 	
 	branchFlag = FALSE;
@@ -182,34 +204,10 @@ sd2gramSubtree = function(sdFileName, sdFileName2 = "",
 			K <- do.call(rbind,aSet$getGramNormal() )
 			
 		}
-		
-		
-		
-		xx <- try(molNames1 <- getMoleculeNamesFromSDF(sdFileName))
-		if (inherits(xx,"try-error") | length(molNames1)!=nrow(K)){
-			molNames1 <- paste("Mol",1:nrow(K),sep="")
-		}
-		
-		if (sdFileName2==""){
-			molNames2 <- molNames1
-		} else {
-			yy <- try(molNames2 <- getMoleculeNamesFromSDF(sdFileName2))
-			if (inherits(yy,"try-error") | length(molNames2)!=ncol(K)){
-				molNames2 <- paste("Mol",(nrow(K)+1):(nrow(K)+ncol(K)))
-			}
-		}
-		
-		
-		rownames(K) <- molNames1
-		colnames(K) <- molNames2
-		
-		return ( K )
-		
-		
+			
 		
 		#aSet$writeSelfKernelList( outputDir + baseName + "_test", silentMode );
 		#aSet2$writeSelfKernelList( outputDir + baseName + "_train", silentMode );
-		
 		
 		
 	}else{ #  SELF KERNEL
@@ -280,31 +278,53 @@ sd2gramSubtree = function(sdFileName, sdFileName2 = "",
 			
 		}
 		
+		#aSet$writeSelfKernelList( outputDir + baseName + "_train", false);
 		
-		
-		xx <- try(molNames1 <- getMoleculeNamesFromSDF(sdFileName))
-		if (inherits(xx,"try-error") | length(molNames1)!=nrow(K)){
-			molNames1 <- paste("Mol",1:nrow(K),sep="")
-		}
-		
-		if (sdFileName2==""){
-			molNames2 <- molNames1
-		} else {
-			yy <- try(molNames2 <- getMoleculeNamesFromSDF(sdFileName2))
-			if (inherits(yy,"try-error") | length(molNames2)!=ncol(K)){
-				molNames2 <- paste("Mol",(nrow(K)+1):(nrow(K)+ncol(K)))
+	} 
+	
+	
+	#name the molecules
+	if (moleculeNameProperty != "")
+	{
+		molnames = c()
+		for (i in 0:(aSet$numMolecules() -1))
+		{
+			mol = aSet$getMolByIndex(i);
+			
+			if( moleculeNameProperty %in% mol$listStringDescriptors() )
+			{
+				molnames = c(molnames, mol$getStringDescriptorValue(moleculeNameProperty))
 			}
+			else
+			{
+				molnames = c(molnames, i)
+			}	
 		}
-		
-		
-		rownames(K) <- molNames1
-		colnames(K) <- molNames2
-		
-		return ( K )
-		
-#aSet$writeSelfKernelList( outputDir + baseName + "_train", false);
-		
-	}  
+		rownames(K) <- molnames
+
+		if (sdFileName2==""){
+			colnames(K) <- molnames
+		} else {
+			molnames2 = c()
+			for (i in 0:(aSet2$numMolecules() -1))
+			{
+				mol2 = aSet2$getMolByIndex(i);
+			
+				if( moleculeNameProperty2 %in% mol2$listStringDescriptors() )
+				{
+					molnames2 = c(molnames2, mol2$getStringDescriptorValue(moleculeNameProperty2))
+				}
+				else
+				{
+					molnames2 = c(molnames2, i)
+				}	
+			}
+			colnames(K) <- molnames2
+		}
+			
+	}
+	
+	return ( K ) 
 	
 }
 

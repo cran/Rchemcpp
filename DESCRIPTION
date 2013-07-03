@@ -1,8 +1,8 @@
 Package: Rchemcpp
 Type: Package
 Title: An R package for computing the similarity of molecules
-Version: 1.0.6
-Date: 2013-02-01
+Version: 1.1.1
+Date: 2013-07-03
 Author: Michael Mahr, Guenter Klambauer
 Maintainer: Guenter Klambauer <klambauer@bioinf.jku.at>
 Description: The Rchemcpp package implements the marginalized graph
@@ -11,14 +11,15 @@ Description: The Rchemcpp package implements the marginalized graph
         similarity of molecules.
 License: GPL (>= 2.1)
 URL: http://www.bioinf.jku.at/software/Rchemcpp
-Depends: Rcpp (>= 0.9.13), R (>= 2.15.0), RcppClassic, methods
+Depends: Rcpp (>= 0.9.13), R (>= 2.15.0), methods
 Suggests: apcluster
-LinkingTo: RcppClassic, Rcpp
+LinkingTo: Rcpp
 RcppModules: Rmolecule, Rmoleculeset, Relements, spectrumhelper,
         spectrum3Dhelper, subtreehelper
 Collate: 'getMoleculeNamesFromSDF.R' 'sd2gram3Dpharma.R'
         'sd2gram3Dspectrum.R' 'sd2gram.R' 'sd2gramSpectrum.R'
         'sd2gramSubtree.R' 'utility.R' 'zzz.R' 'roxygen.R'
-Packaged: 2013-02-01 09:32:56 UTC; klambaue
+Packaged: 2013-03-07 14:37:53 UTC; klambaue
+NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2013-02-01 16:08:03
+Date/Publication: 2013-03-07 16:20:39

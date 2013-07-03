@@ -108,7 +108,7 @@ computes the similarity of the molecules with the marginalized kernel
 <<results=hide>>=
 sdfolder <- system.file("sample_data",package="Rchemcpp")
 sdf <- list.files(sdfolder,full.names=TRUE,pattern="small")
-K <- sd2gram(sdf,returnNormalized=TRUE)
+K <- sd2gram(sdf,returnNormalized=TRUE,moleculeNameProperty="Compound Name")
 @
 
 The similarity values are now stored in {\tt K}. We visualize this matrix as

@@ -3,7 +3,6 @@
 #define RMOLECULESET_H
 
 #include <Rcpp.h>
-#include <RcppClassic.h>
 #include <Rinternals.h>
 
 #include "Rmolecule.h"
@@ -315,6 +314,33 @@ public:
 	 
 	void writeSelfKernelList( string aFileName, bool silentMode )
 	{MoleculeSet::writeSelfKernelList(aFileName,silentMode);}
+
+	//Extension 1.0.7
+
+	SEXP getMolByIndex(int anInd)
+	{
+		//Unfortunately the RTLD_GLOBAL is not used by Rs library.dynam() internally, so catching exceptions from the stdcpp library does not work... 
+		//So we have to check ourselves... (we are zero-based here)
+		if (anInd < 0 || anInd >= MoleculeSet::numMolecules())
+		{
+			CError e = CError(MOLECULENOTFOUND, "Index out of range");
+			e.describe();
+			throw(e);
+		}
+			
+		Molecule *res = MoleculeSet::getMolByIndex(anInd);
+		
+		//Not nice, but works, because the derived class has no additional members:
+		//  cast from base to derived class 
+		void* res2 = static_cast<void*>(res);
+		Rmolecule* res3 = static_cast<Rmolecule*>(res2);
+		
+		Rcpp::XPtr<Rmolecule> xp((Rmolecule*)res3, false); //do NOT mark as finalizable!
+		Rcpp::Function maker=Rcpp::Environment::Rcpp_namespace()[ "cpp_object_maker"];
+		return maker ( typeid(Rmolecule).name() , xp );
+			
+	}
+	
 
 private:
 

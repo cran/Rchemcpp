@@ -14,8 +14,8 @@ It uses the compiled-in c++ library "chemcpp" to emulate the five chemcpp tools
 \tabular{ll}{
 	Package: \tab Rchemcpp\cr
 	Type: \tab Package\cr
-	Version: \tab 1.0.4\cr
-	Date: \tab 2012-10-15\cr
+	Version: \tab 1.1.1\cr
+	Date: \tab 2013-07-03\cr
 	License: \tab GPL2.1\cr
 	}
 }
@@ -77,12 +77,12 @@ Trees and Sequences, pages 65-74, 2003.
 sdfolder <- system.file("sample_data",package="Rchemcpp")
 
 sdf_small <- list.files(sdfolder,full.names=TRUE,pattern="small")
-K1 <- sd2gram(sdf_small)
-K2 <- sd2gramSpectrum(sdf_small)
-K3 <- sd2gramSubtree(sdf_small)
+K1 <- sd2gram(sdf_small, moleculeNameProperty="Compound Name")
+K2 <- sd2gramSpectrum(sdf_small, moleculeNameProperty="Compound Name")
+K3 <- sd2gramSubtree(sdf_small, moleculeNameProperty="Compound Name")
 
 sdf_tiny <- list.files(sdfolder,full.names=TRUE,pattern="tiny")
-K4 <- sd2gram3Dspectrum(sdf_tiny)
-K5 <- sd2gram3Dpharma(sdf_tiny)
+K4 <- sd2gram3Dspectrum(sdf_tiny, moleculeNameProperty="Compound Name")
+K5 <- sd2gram3Dpharma(sdf_tiny, moleculeNameProperty="Compound Name")
 }
 

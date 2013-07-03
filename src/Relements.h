@@ -3,7 +3,6 @@
 #define RELEMENTS_H
 
 #include <Rcpp.h>
-#include <RcppClassic.h>
 
 #include <elements.h>
 

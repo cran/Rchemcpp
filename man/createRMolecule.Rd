@@ -1,6 +1,6 @@
 \name{createRMolecule}
 \alias{createRMolecule}
-\title{Rchemcpp::createRMolecule}
+\title{createRMolecule}
 \usage{
   createRMolecule(atoms, bonds)
 }
@@ -16,18 +16,13 @@
   an instance of "molecule"
 }
 \description{
-  This function creates an Rchemcpp::Rmolecule from an atom-vector
-  and a bond-matrix.
-  The resulting object can be added to an Rmoleculeset afterwards.
+  Creates an Rchemcpp::Rmolecule from an atom-vector and a
+  bond-matrix
+}
+\examples{
+m <- createRMolecule(c("C","C"),matrix(c(0,3,3,0),nrow=2))
 }
 \author{
   Michael Mahr <rchemcpp@bioinf.jku.at>
 }
-\examples{
-mset = new (Rchemcpp::Rmoleculeset)
-mole = createRMolecule(c("H","O","H"),matrix(data =
-c(0,1,0,
-  1,0,1,
-  0,1,0), ncol = 3))
-mset$addMoleculeCopy(mole)
-}
+

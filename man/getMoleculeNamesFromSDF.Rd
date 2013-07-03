@@ -1,17 +1,15 @@
-\name{getMoleculePropertyFromSDF}
-\alias{getMoleculePropertyFromSDF}
-\title{getMoleculePropertyFromSDF - a helper function}
+\name{getMoleculeNamesFromSDF}
+\alias{getMoleculeNamesFromSDF}
+\title{getMoleculeNamesFromSDF - a helper function}
 \usage{
-  getMoleculePropertyFromSDF(sdfile,property)
+  getMoleculeNamesFromSDF(sdfile)
 }
 \arguments{
   \item{sdfile}{A character containing the name of the SDF
   file.}
-
-  \item{property}{The name of the slot in the SDF.}
 }
 \value{
-  A character vector with one value per molecule.
+  A character vector with one name per molecule.
 }
 \description{
   This function helps to extract a certain property from an
@@ -25,7 +23,7 @@
 \examples{
 sdfolder <- system.file("sample_data",package="Rchemcpp")
 sdf <- list.files(sdfolder,full.names=TRUE,pattern="small")
-moleculeNames <- getMoleculePropertyFromSDF(sdf,"Activity")
+moleculeNames <- getMoleculeNamesFromSDF(sdf)
 }
 \author{
   Guenter Klambauer <rchemcpp@bioinf.jku.at>

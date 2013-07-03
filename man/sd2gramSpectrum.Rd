@@ -1,14 +1,16 @@
 \name{sd2gramSpectrum}
 \alias{sd2gramSpectrum}
-\title{Rchemcpp::sd2gramSpectrum}
+\title{sd2gramSpectrum - Similarity of molecules by walk-based graph kernels}
 \usage{
-  sd2gramSpectrum(sdFileName, sdFileName2 = "",
-    kernelType = c("spectrum", "tanimoto", "minmaxTanimoto", "marginalized", "lambda"),
-    margKernelEndProbability = 0.1, lambdaKernelLambda = 1,
-    depthMax = as.integer(0), onlyDepthMax = FALSE,
+  sd2gramSpectrum(sdFileName, sdFileName2 = "", kernelType
+    = c("spectrum", "tanimoto",
+    "minmaxTanimoto","marginalized","lambda"),
+    margKernelEndProbability = 0.1, lambdaKernelLambda =
+    1.0, depthMax = as.integer(0), onlyDepthMax = FALSE ,
     flagRemoveH = FALSE, morganOrder = as.integer(0),
-    fileType = c("sd", "genericsd", "kcf"),
-    silentMode = FALSE, returnNormalized = FALSE)
+    fileType = c("sd","genericsd","kcf"), silentMode =
+    FALSE, returnNormalized = FALSE, moleculeNameProperty =
+    "", moleculeNameProperty2 = "")
 }
 \arguments{
   \item{sdFileName}{File containing the molecules. Must be
@@ -59,15 +61,21 @@
   \item{returnNormalized}{A logical specifying whether a
   normalized kernel matrix should be returned. Default =
   TRUE.}
+
+  \item{moleculeNameProperty}{A string which specifies the
+  name of the property of the molecules in the sdFile from
+  which the row names (and column names) are read from.
+  Default = "".}
+
+  \item{moleculeNameProperty2}{A string which specifies the
+  name of the property of the molecules in the sdFile 2
+  from which the column names are read from. Default = "".}
 }
 \value{
   A numeric matrix containing the similarity values between
   the molecules.
 }
 \description{
-  Computes a similarity matrix from molecules by walk-based
-  graph kernels
-
   This function computes several walk-based graph kernel
   functions based on finite length walks and a fast
   implementation for input sd file(s).
@@ -75,7 +83,7 @@
 \examples{
 sdfolder <- system.file("sample_data",package="Rchemcpp")
 sdf <- list.files(sdfolder,full.names=TRUE,pattern="small")
-K <- sd2gramSpectrum(sdf)
+K <- sd2gramSpectrum(sdf, moleculeNameProperty="Compound Name")
 }
 \author{
   Michael Mahr <rchemcpp@bioinf.jku.at> c++ function

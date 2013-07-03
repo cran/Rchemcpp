@@ -1,15 +1,18 @@
 \name{sd2gram3Dspectrum}
 \alias{sd2gram3Dspectrum}
-\title{Rchemcpp::sd2gram3Dspectrum}
+\title{sd2gram3Dspectrum - Similarity of molecules by fast
+approximations of the pharmacophore kernel}
 \usage{
   sd2gram3Dspectrum(sdFileName, sdFileName2 = "",
-    chargesFileName = "", chargesFileName2 = "",
-    kernelType = c("3Pspectrum", "3Pbinary", "3Ptanimoto", "2Pspectrum", "2Pbinary", "2Ptanimoto"),
-    depthMax = as.integer(3), nBins = as.integer(20),
-    distMin = 0, distMax = 20, flagRemoveH = FALSE,
-    morganOrder = as.integer(0), chargesThreshold = 0,
-    fileType = c("sd", "genericsd", "kcf"),
-    silentMode = FALSE, returnNormalized = FALSE)
+    chargesFileName = "", chargesFileName2 = "", kernelType
+    = c("3Pspectrum", "3Pbinary", "3Ptanimoto",
+    "2Pspectrum", "2Pbinary", "2Ptanimoto" ), depthMax =
+    as.integer(3), nBins = as.integer(20), distMin = 0,
+    distMax = 20, flagRemoveH = FALSE, morganOrder =
+    as.integer(0), chargesThreshold = 0, fileType = c("sd",
+    "genericsd","kcf"), silentMode = FALSE,
+    returnNormalized = FALSE, moleculeNameProperty = "",
+    moleculeNameProperty2 = "")
 }
 \arguments{
   \item{sdFileName}{File containing the molecules. Must be
@@ -77,15 +80,21 @@
   \item{returnNormalized}{A logical specifying whether a
   normalized kernel matrix should be returned. Default =
   TRUE.}
+
+  \item{moleculeNameProperty}{A string which specifies the
+  name of the property of the molecules in the sdFile from
+  which the row names (and column names) are read from.
+  Default = "".}
+
+  \item{moleculeNameProperty2}{A string which specifies the
+  name of the property of the molecules in the sdFile 2
+  from which the column names are read from. Default = "".}
 }
 \value{
   A numeric matrix containing the similarity values between
   the molecules.
 }
 \description{
-  Computes a similarity matrix from molecules by fast
-  approximations of the pharmacophore kernel
-
   This tool implements the six discrete approximations of
   the pharmacophore kernel presented in "The pharmacophore
   kernel for virtual screening with support vector
@@ -93,8 +102,8 @@
 }
 \examples{
 sdfolder <- system.file("sample_data",package="Rchemcpp")
-sdf <- list.files(sdfolder,full.names=TRUE,pattern="tiny")
-K <- sd2gram3Dspectrum(sdf)
+sdf <- list.files(sdfolder,full.names=TRUE,pattern="small")
+K <- sd2gram3Dspectrum(sdf, moleculeNameProperty="Compound Name")
 }
 \author{
   Michael Mahr <rchemcpp@bioinf.jku.at> c++ function

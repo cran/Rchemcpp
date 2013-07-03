@@ -2,8 +2,16 @@
 #' @title sd2gram3Dpharma - Similarity of molecules by the exact pharmacophore
 #' kernel.
 #' 
-#' This tool implements the (exact version of) pharmacophore kernel for 3D 
+#' @description This tool implements the (exact version of) pharmacophore kernel for 3D 
 #' structures of molecules (\cite{Mahe, 2006}).
+#' 
+#' @usage sd2gram3Dpharma(sdFileName, sdFileName2 = "", chargesFileName = "", 
+#'		chargesFileName2 = "",  edgeKernelType = c("RBF", "triangular"), 
+#'		edgeKernelParameter = 1, atomKernelMatrix = "", flagRemoveH = FALSE, 
+#'		morganOrder = as.integer(0), morganChargesThreshold = 0, 
+#'		fileType = c("sd","genericsd","kcf"), silentMode = FALSE, 
+#'		returnNormalized = FALSE, moleculeNameProperty = "", moleculeNameProperty2 = "")
+#' 
 #' 
 #' @param sdFileName File containing the molecules. Must be in MDL file format
 #' (MOL and SDF files). For more information on the file format see 
@@ -34,10 +42,16 @@
 #' to the standart output.
 #' @param returnNormalized A logical specifying whether a normalized kernel
 #' matrix should be returned. Default = TRUE.
+#' @param moleculeNameProperty A string which specifies the name of the property
+#' of the molecules in the sdFile from which the row names (and column names)
+#' are read from. Default = "".
+#' @param moleculeNameProperty2 A string which specifies the name of the property
+#' of the molecules in the sdFile 2 from which the column names are read from.
+#' Default = "".
 #' @examples 
 #' sdfolder <- system.file("sample_data",package="Rchemcpp")
 #' sdf <- list.files(sdfolder,full.names=TRUE,pattern="small")
-#' K <- sd2gram(sdf)
+#' K <- sd2gram(sdf, moleculeNameProperty="Compound Name")
 #' @return A numeric matrix containing the similarity values between the
 #' molecules.
 #' @author Michael Mahr <rchemcpp@@bioinf.jku.at>
@@ -46,6 +60,12 @@
 #' The pharmacophore kernel for virtual screening
 #' with support vector machines. Technical Report, HAL:ccsd-00020066, Ecole des
 #' Mines de Paris, March 2006.
+#' 
+#' @examples 
+#' sdfolder <- system.file("sample_data",package="Rchemcpp")
+#' sdf <- list.files(sdfolder,full.names=TRUE,pattern="tiny")
+#' moleculeNames <- sd2gram3Dpharma(sdf)
+#' 
 #' @export
 
 
@@ -54,7 +74,7 @@ sd2gram3Dpharma = function(sdFileName, sdFileName2 = "", chargesFileName = "",
 		edgeKernelParameter = 1, atomKernelMatrix = "", flagRemoveH = FALSE, 
 		morganOrder = as.integer(0), morganChargesThreshold = 0, 
 		fileType = c("sd","genericsd","kcf"), silentMode = FALSE, 
-		returnNormalized = FALSE)
+		returnNormalized = FALSE, moleculeNameProperty = "", moleculeNameProperty2 = "")
 {
 	
 	if(!is.character(sdFileName)) stop("sdFileName must be string")
@@ -198,34 +218,11 @@ sd2gram3Dpharma = function(sdFileName, sdFileName2 = "", chargesFileName = "",
 		}
 		
 		
-		
-		xx <- try(molNames1 <- getMoleculeNamesFromSDF(sdFileName))
-		if (inherits(xx,"try-error") | length(molNames1)!=nrow(K)){
-			molNames1 <- paste("Mol",1:nrow(K),sep="")
-		}
-		
-		if (sdFileName2==""){
-			molNames2 <- molNames1
-		} else {
-			yy <- try(molNames2 <- getMoleculeNamesFromSDF(sdFileName2))
-			if (inherits(yy,"try-error") | length(molNames2)!=ncol(K)){
-				molNames2 <- paste("Mol",(nrow(K)+1):(nrow(K)+ncol(K)))
-			}
-		}
-		
-		
-		rownames(K) <- molNames1
-		colnames(K) <- molNames2
-		
-		return ( K )
-		
-		
 		#aSet$writeSelfKernelList( outputDir + baseName + "_test", silentMode );
 		#aSet2$writeSelfKernelList( outputDir + baseName + "_train", silentMode );
 		# and exit
 		#aSet$deleteAll();   should be done by destructor
 		#aSet2$deleteAll();  should be done by destructor
-		
 		
 	}
 	else{ # self-set version
@@ -319,28 +316,6 @@ sd2gram3Dpharma = function(sdFileName, sdFileName2 = "", chargesFileName = "",
 		}
 		
 		
-		
-		xx <- try(molNames1 <- getMoleculeNamesFromSDF(sdFileName))
-		if (inherits(xx,"try-error") | length(molNames1)!=nrow(K)){
-			molNames1 <- paste("Mol",1:nrow(K),sep="")
-		}
-		
-		if (sdFileName2==""){
-			molNames2 <- molNames1
-		} else {
-			yy <- try(molNames2 <- getMoleculeNamesFromSDF(sdFileName2))
-			if (inherits(yy,"try-error") | length(molNames2)!=ncol(K)){
-				molNames2 <- paste("Mol",(nrow(K)+1):(nrow(K)+ncol(K)))
-			}
-		}
-		
-		
-		rownames(K) <- molNames1
-		colnames(K) <- molNames2
-		
-		return ( K )
-		
-		
 		# write the gram matrix to a file (raw and normalized matrices)
 		#aSet$writeGramMatrix( outputDir + baseName, false, false, silentMode);
 		#aSet$writeGramMatrix( outputDir + baseName, true, false, silentMode);
@@ -350,6 +325,49 @@ sd2gram3Dpharma = function(sdFileName, sdFileName2 = "", chargesFileName = "",
 		#aSet$deleteAll();  should be done by destructor
 	}
 	
+	
+	#name the molecules
+	if (moleculeNameProperty != "")
+	{
+		molnames = c()
+		for (i in 0:(aSet$numMolecules() -1))
+		{
+			mol = aSet$getMolByIndex(i);
+			
+			if( moleculeNameProperty %in% mol$listStringDescriptors() )
+			{
+				molnames = c(molnames, mol$getStringDescriptorValue(moleculeNameProperty))
+			}
+			else
+			{
+				molnames = c(molnames, i)
+			}	
+		}
+		rownames(K) <- molnames
+
+		if (sdFileName2==""){
+			colnames(K) <- molnames
+		} else {
+			molnames2 = c()
+			for (i in 0:(aSet2$numMolecules() -1))
+			{
+				mol2 = aSet2$getMolByIndex(i);
+			
+				if( moleculeNameProperty2 %in% mol2$listStringDescriptors() )
+				{
+					molnames2 = c(molnames2, mol2$getStringDescriptorValue(moleculeNameProperty2))
+				}
+				else
+				{
+					molnames2 = c(molnames2, i)
+				}	
+			}
+			colnames(K) <- molnames2
+		}
+			
+	}
+	
+	return ( K )
 	
 	
 }

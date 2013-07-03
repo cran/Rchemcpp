@@ -1,14 +1,16 @@
 \name{sd2gramSubtree}
 \alias{sd2gramSubtree}
-\title{Rchemcpp::sd2gramSubtree}
+\title{sd2gramSubtree - Similarity of molecules by several graph kernels
+based on the count of common subtrees}
 \usage{
-  sd2gramSubtree(sdFileName, sdFileName2 = "",
-    kernelType = c("sizebased", "branchingbased"),
-    branchKernelUntilN = FALSE, lambda = 1,
-    depthMax = as.integer(3), flagRemoveH = FALSE,
-    filterTottering = FALSE, morganOrder = as.integer(0),
-    fileType = c("sd", "genericsd", "kcf"),
-    silentMode = FALSE, returnNormalized = FALSE)
+  sd2gramSubtree(sdFileName, sdFileName2 = "", kernelType =
+    c("sizebased","branchingbased") , branchKernelUntilN =
+    FALSE, lambda = 1, depthMax = as.integer(3),
+    flagRemoveH = FALSE, filterTottering = FALSE,
+    morganOrder = as.integer(0), fileType = c("sd",
+    "genericsd","kcf"), silentMode = FALSE,
+    returnNormalized = FALSE, moleculeNameProperty = "",
+    moleculeNameProperty2 = "")
 }
 \arguments{
   \item{sdFileName}{File containing the molecules. Must be
@@ -54,15 +56,21 @@
   \item{returnNormalized}{A logical specifying whether a
   normalized kernel matrix should be returned. Default =
   TRUE.}
+
+  \item{moleculeNameProperty}{A string which specifies the
+  name of the property of the molecules in the sdFile from
+  which the row names (and column names) are read from.
+  Default = "".}
+
+  \item{moleculeNameProperty2}{A string which specifies the
+  name of the property of the molecules in the sdFile 2
+  from which the column names are read from. Default = "".}
 }
 \value{
   A numeric matrix containing the similarity values between
   the molecules.
 }
 \description{
-  Computes a similarity matrix from molecules by several graph
-  kernels based on the count of common subtrees.
-
   This tools computes several graph kernels based on the
   detection of common subtrees: the so-called tree-pattern
   graph kernels, originally introduced in (\cite{Ramon,
@@ -71,7 +79,7 @@
 \examples{
 sdfolder <- system.file("sample_data",package="Rchemcpp")
 sdf <- list.files(sdfolder,full.names=TRUE,pattern="small")
-K <- sd2gramSubtree(sdf)
+K <- sd2gram(sdf, moleculeNameProperty="Compound Name")
 }
 \author{
   Michael Mahr <rchemcpp@bioinf.jku.at> c++ function

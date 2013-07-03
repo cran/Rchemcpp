@@ -1,8 +1,17 @@
 #' @title sd2gram - Similarity of molecules by the marginalized kernel and 
 #' proposed extensions.
 #' 
-#' This tools compute the marginalized kernel (\cite{Kashima, 2004})
+#' @description This tools compute the marginalized kernel (\cite{Kashima, 2004})
 #' and its proposed extensions (\cite{Mahe, 2005)}.
+#' 
+#' @usage sd2gram(sdFileName, sdFileName2 = "", stopP = 0.1, 
+#'		filterTottering = FALSE, converg = as.integer(1000),  
+#'		atomKernelMatrix = "", flagRemoveH = FALSE, morganOrder = as.integer(0),
+#'		fileType = c("sd","genericsd","kcf"), silentMode = FALSE, 
+#'		returnNormalized = TRUE, moleculeNameProperty = "",
+#'		moleculeNameProperty2 = "")
+#' 
+#' 
 #' 
 #' @param sdFileName File containing the molecules. Must be in MDL file format
 #' (MOL and SDF files). For more information on the file format see 
@@ -29,10 +38,16 @@
 #' to the standart output. Default = FALSE.
 #' @param returnNormalized A logical specifying whether a normalized kernel
 #' matrix should be returned. Default = TRUE.
+#' @param moleculeNameProperty A string which specifies the name of the property
+#' of the molecules in the sdFile from which the row names (and column names)
+#' are read from. Default = "".
+#' @param moleculeNameProperty2 A string which specifies the name of the property
+#' of the molecules in the sdFile 2 from which the column names are read from.
+#' Default = "".
 #' @examples 
 #' sdfolder <- system.file("sample_data",package="Rchemcpp")
 #' sdf <- list.files(sdfolder,full.names=TRUE,pattern="small")
-#' K <- sd2gram(sdf)
+#' K <- sd2gram(sdf, moleculeNameProperty="Compound Name")
 #' @return A numeric matrix containing the similarity values between the
 #' molecules.
 #' @author Michael Mahr <rchemcpp@@bioinf.jku.at>
@@ -47,6 +62,12 @@
 #' Graph kernels for molecular structure-
 #' activity relationship analysis with support vector machines. 
 #' J Chem Inf Model, 45(4):939-51, 2005.
+#' 
+#' @examples 
+#' sdfolder <- system.file("sample_data",package="Rchemcpp")
+#' sdf <- list.files(sdfolder,full.names=TRUE,pattern="small")
+#' moleculeNames <- sd2gram(sdf)
+#' 
 #' @export
 
 
@@ -54,7 +75,8 @@ sd2gram = function(sdFileName, sdFileName2 = "", stopP = 0.1,
 		filterTottering = FALSE, converg = as.integer(1000),  
 		atomKernelMatrix = "", flagRemoveH = FALSE, morganOrder = as.integer(0),
 		fileType = c("sd","genericsd","kcf"), silentMode = FALSE, 
-		returnNormalized = TRUE)
+		returnNormalized = TRUE, moleculeNameProperty = "",
+		moleculeNameProperty2 = "")
 {
 	
 	nbThreadsWanted = as.integer(1)
@@ -245,24 +267,46 @@ sd2gram = function(sdFileName, sdFileName2 = "", stopP = 0.1,
 	}
 	
 	
-	
-	xx <- try(molNames1 <- getMoleculeNamesFromSDF(sdFileName))
-	if (inherits(xx,"try-error") | length(molNames1)!=nrow(K)){
-		molNames1 <- paste("Mol",1:nrow(K),sep="")
-	}
-	
-	if (sdFileName2==""){
-		molNames2 <- molNames1
-	} else {
-		yy <- try(molNames2 <- getMoleculeNamesFromSDF(sdFileName2))
-		if (inherits(yy,"try-error") | length(molNames2)!=ncol(K)){
-			molNames2 <- paste("Mol",(nrow(K)+1):(nrow(K)+ncol(K)))
+	#name the molecules
+	if (moleculeNameProperty != "")
+	{
+		molnames = c()
+		for (i in 0:(aSet$numMolecules() -1))
+		{
+			mol = aSet$getMolByIndex(i);
+			
+			if( moleculeNameProperty %in% mol$listStringDescriptors() )
+			{
+				molnames = c(molnames, mol$getStringDescriptorValue(moleculeNameProperty))
+			}
+			else
+			{
+				molnames = c(molnames, i)
+			}	
 		}
+		rownames(K) <- molnames
+
+		if (sdFileName2==""){
+			colnames(K) <- molnames
+		} else {
+			molnames2 = c()
+			for (i in 0:(aSet2$numMolecules() -1))
+			{
+				mol2 = aSet2$getMolByIndex(i);
+			
+				if( moleculeNameProperty2 %in% mol2$listStringDescriptors() )
+				{
+					molnames2 = c(molnames2, mol2$getStringDescriptorValue(moleculeNameProperty2))
+				}
+				else
+				{
+					molnames2 = c(molnames2, i)
+				}	
+			}
+			colnames(K) <- molnames2
+		}
+			
 	}
-	
-	
-	rownames(K) <- molNames1
-	colnames(K) <- molNames2
 	
 	return ( K )
 	

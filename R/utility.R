@@ -1,12 +1,17 @@
 #' @title createRMolecule
 #' 
-#' Creates an Rchemcpp::Rmolecule from an atom-vector and a bond-matrix 
+#' @description Creates an Rchemcpp::Rmolecule from an atom-vector and a bond-matrix 
+#' 
+#' @usage createRMolecule(atoms, bonds)
 #' 
 #' @param atoms A vector containing the symbol names of all atoms in the molecule
 #' @param bonds A matrix with the same number of rows and columns as the atoms-vector
 #' containing the type of bonds between the atoms
 #' @return an instance of "molecule"
 #' @author Michael Mahr <rchemcpp@@bioinf.jku.at>
+#' 
+#' @examples 
+#' m <- createRMolecule(c("C","C"),matrix(c(0,3,3,0),nrow=2))
 #' @export
 
 

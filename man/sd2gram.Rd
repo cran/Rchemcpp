@@ -1,13 +1,14 @@
 \name{sd2gram}
 \alias{sd2gram}
-\title{Rchemcpp::sd2gram}
+\title{sd2gram - Similarity of molecules by the marginalized kernel and
+proposed extensions.}
 \usage{
   sd2gram(sdFileName, sdFileName2 = "", stopP = 0.1,
     filterTottering = FALSE, converg = as.integer(1000),
-    atomKernelMatrix = "", flagRemoveH = FALSE,
-    morganOrder = as.integer(0),
-    fileType = c("sd", "genericsd", "kcf"),
-    silentMode = FALSE, returnNormalized = TRUE)
+    atomKernelMatrix = "", flagRemoveH = FALSE, morganOrder
+    = as.integer(0), fileType = c("sd","genericsd","kcf"),
+    silentMode = FALSE, returnNormalized = TRUE,
+    moleculeNameProperty = "", moleculeNameProperty2 = "")
 }
 \arguments{
   \item{sdFileName}{File containing the molecules. Must be
@@ -54,15 +55,21 @@
   \item{returnNormalized}{A logical specifying whether a
   normalized kernel matrix should be returned. Default =
   TRUE.}
+
+  \item{moleculeNameProperty}{A string which specifies the
+  name of the property of the molecules in the sdFile from
+  which the row names (and column names) are read from.
+  Default = "".}
+
+  \item{moleculeNameProperty2}{A string which specifies the
+  name of the property of the molecules in the sdFile 2
+  from which the column names are read from. Default = "".}
 }
 \value{
   A numeric matrix containing the similarity values between
   the molecules.
 }
 \description{
-  Computes a similarity matrix from molecules by the marginalized
-  kernel and proposed extensions.
-
   This tools compute the marginalized kernel
   (\cite{Kashima, 2004}) and its proposed extensions
   (\cite{Mahe, 2005)}.
@@ -70,7 +77,7 @@
 \examples{
 sdfolder <- system.file("sample_data",package="Rchemcpp")
 sdf <- list.files(sdfolder,full.names=TRUE,pattern="small")
-K <- sd2gram(sdf)
+K <- sd2gram(sdf, moleculeNameProperty="Compound Name")
 }
 \author{
   Michael Mahr <rchemcpp@bioinf.jku.at> c++ function
